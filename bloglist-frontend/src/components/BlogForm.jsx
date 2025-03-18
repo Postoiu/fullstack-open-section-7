@@ -1,19 +1,26 @@
 import { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { create } from '../reducers/blogReducer'
 
-const BlogForm = ({ createBlog }) => {
+const BlogForm = ({ blogFormRef }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
   const [likes, setLikes] = useState(0)
 
+  const dispatch = useDispatch()
+
   const addBlog = (event) => {
     event.preventDefault()
-    createBlog({
-      title,
-      author,
-      url,
-      likes
-    })
+    blogFormRef.current.toggleVisibility()
+    dispatch(
+      create({
+        title,
+        author,
+        url,
+        likes,
+      })
+    )
 
     setTitle('')
     setAuthor('')
@@ -29,7 +36,7 @@ const BlogForm = ({ createBlog }) => {
           title:
           <input
             data-testid='title'
-            type="text"
+            type='text'
             value={title}
             name='title'
             onChange={({ target }) => setTitle(target.value)}
@@ -39,7 +46,7 @@ const BlogForm = ({ createBlog }) => {
           author:
           <input
             data-testid='author'
-            type="text"
+            type='text'
             value={author}
             name='author'
             onChange={({ target }) => setAuthor(target.value)}
@@ -49,7 +56,7 @@ const BlogForm = ({ createBlog }) => {
           url:
           <input
             data-testid='url'
-            type="text"
+            type='text'
             value={url}
             name='url'
             onChange={({ target }) => setUrl(target.value)}
@@ -59,7 +66,7 @@ const BlogForm = ({ createBlog }) => {
           likes:
           <input
             data-testid='likes'
-            type="number"
+            type='number'
             value={likes}
             name='likes'
             onChange={({ target }) => setLikes(parseInt(target.value))}
