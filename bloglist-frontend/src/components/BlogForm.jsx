@@ -1,18 +1,55 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import blogService from '../services/blogs'
+import { useSetNotification } from '../hooks'
 
-const BlogForm = ({ createBlog }) => {
+const BlogForm = ({ blogFormRef }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
   const [likes, setLikes] = useState(0)
 
+  const queryClient = useQueryClient()
+  const dispatchNotification = useSetNotification()
+
+  const newBlogMutation = useMutation({
+    mutationFn: blogService.create,
+    onSuccess: (newBlog) => {
+      dispatchNotification(
+        {
+          type: 'SET',
+          payload: {
+            message: `a new blog ${newBlog.title} by ${newBlog.author} added`,
+          },
+        },
+        5
+      )
+      const blogs = queryClient.getQueryData(['blogs'])
+      queryClient.setQueryData(['blogs'], blogs.concat(newBlog))
+    },
+    onErorr: (error) => {
+      dispatchNotification(
+        {
+          type: 'SET',
+          payload: {
+            message: error.response.data.error,
+            isError: true,
+          },
+        },
+        5
+      )
+    },
+  })
+
   const addBlog = (event) => {
     event.preventDefault()
-    createBlog({
+    blogFormRef.current.toggleVisibility()
+
+    newBlogMutation.mutate({
       title,
       author,
       url,
-      likes
+      likes,
     })
 
     setTitle('')
@@ -29,7 +66,7 @@ const BlogForm = ({ createBlog }) => {
           title:
           <input
             data-testid='title'
-            type="text"
+            type='text'
             value={title}
             name='title'
             onChange={({ target }) => setTitle(target.value)}
@@ -39,7 +76,7 @@ const BlogForm = ({ createBlog }) => {
           author:
           <input
             data-testid='author'
-            type="text"
+            type='text'
             value={author}
             name='author'
             onChange={({ target }) => setAuthor(target.value)}
@@ -49,7 +86,7 @@ const BlogForm = ({ createBlog }) => {
           url:
           <input
             data-testid='url'
-            type="text"
+            type='text'
             value={url}
             name='url'
             onChange={({ target }) => setUrl(target.value)}
@@ -59,7 +96,7 @@ const BlogForm = ({ createBlog }) => {
           likes:
           <input
             data-testid='likes'
-            type="number"
+            type='number'
             value={likes}
             name='likes'
             onChange={({ target }) => setLikes(parseInt(target.value))}
