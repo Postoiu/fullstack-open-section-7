@@ -15,7 +15,7 @@ const Home = () => {
 
   useEffect(() => {
     dispatch(initializeBlogs())
-  }, [])
+  }, [dispatch])
 
   return (
     <Container>

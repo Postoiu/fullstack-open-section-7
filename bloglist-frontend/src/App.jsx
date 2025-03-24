@@ -31,7 +31,7 @@ const App = () => {
     }
 
     setLoading(false)
-  }, [])
+  }, [user, dispatch])
 
   if (loading) return <div>Loading...</div>
 

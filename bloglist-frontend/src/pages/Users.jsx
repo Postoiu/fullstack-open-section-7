@@ -11,7 +11,7 @@ const Users = () => {
 
   useEffect(() => {
     dispatch(getAllUsers())
-  }, [])
+  }, [dispatch])
 
   return (
     <Container>
