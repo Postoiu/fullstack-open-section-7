@@ -1,25 +1,24 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import Blog from './components/Blog'
-import Notification from './components/Notification'
+import { Routes, Route, Navigate, Link } from 'react-router-dom'
+import { Navbar, Nav, Container, Button } from 'react-bootstrap'
+
 import blogService from './services/blogs'
 import './index.css'
-import Toggable from './components/Toggable'
-import BlogForm from './components/BlogForm'
-import { initializeBlogs } from './reducers/blogReducer'
-import { login, logout, setUser } from './reducers/userReducer'
+
+import { logout, setUser } from './reducers/authReducer'
+import Home from './pages/Home'
+import Login from './pages/Login'
+import Users from './pages/Users'
+import User from './pages/User'
+import Blog from './pages/Blog'
 
 const App = () => {
-  const blogs = useSelector(({ blogs }) => blogs)
-  const user = useSelector(({ user }) => user)
-
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-
-  const blogFormRef = useRef()
+  const user = useSelector(({ auth }) => auth)
 
   const dispatch = useDispatch()
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const loggedInUser = JSON.parse(
@@ -29,69 +28,59 @@ const App = () => {
     if (!user && loggedInUser !== null) {
       dispatch(setUser(loggedInUser))
       blogService.setToken(loggedInUser.token)
-
-      dispatch(initializeBlogs())
     }
-  }, [user, dispatch])
 
-  const handleLogin = async (event) => {
-    event.preventDefault()
+    setLoading(false)
+  }, [])
 
-    dispatch(login({ username, password }))
-
-    setUsername('')
-    setPassword('')
-  }
-
-  if (user === null) {
-    return (
-      <div>
-        <h2>Log in to application</h2>
-        <Notification />
-        <form onSubmit={handleLogin}>
-          <div>
-            username
-            <input
-              data-testid='username'
-              type='text'
-              value={username}
-              name='username'
-              onChange={({ target }) => setUsername(target.value)}
-            />
-          </div>
-          <div>
-            password
-            <input
-              data-testid='password'
-              type='password'
-              value={password}
-              name='password'
-              onChange={({ target }) => setPassword(target.value)}
-            />
-          </div>
-          <button type='submit'>login</button>
-        </form>
-      </div>
-    )
-  }
+  if (loading) return <div>Loading...</div>
 
   return (
-    <div>
-      <h2>blogs</h2>
-      <Notification />
-      <p>
-        {`${user.name} logged in`}
-        <button onClick={() => dispatch(logout())}>logout</button>
-      </p>
+    <>
+      {user && (
+        <Navbar expand='md' bg='primary-subtle' data-bs-theme='light'>
+          <Container>
+            <Navbar.Toggle aria-controls='basic-navbar-nav' />
+            <Navbar.Collapse id='basic-navbar-nav'>
+              <Nav className='me-auto'>
+                <Link className='nav-link' to='/'>
+                  home
+                </Link>
+                <Link className='nav-link' to='/users'>
+                  users
+                </Link>
+              </Nav>
+              <Navbar.Text className='ms-auto'>
+                <span>
+                  {`${user.name} logged in`}
+                  <Button
+                    variant='primary'
+                    className='ms-1'
+                    onClick={() => dispatch(logout())}
+                  >
+                    logout
+                  </Button>
+                </span>
+              </Navbar.Text>
+            </Navbar.Collapse>
+          </Container>
+        </Navbar>
+      )}
 
-      <Toggable buttonLabel='new blog' ref={blogFormRef}>
-        <BlogForm blogFormRef={blogFormRef} />
-      </Toggable>
-
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} currentUser={user} />
-      ))}
-    </div>
+      <Routes>
+        <Route path='/login' element={<Login />} />
+        <Route
+          path='/'
+          element={user ? <Home /> : <Navigate replace to='/login' />}
+        />
+        <Route
+          path='/users'
+          element={user ? <Users /> : <Navigate replace to='/login' />}
+        />
+        <Route path='/users/:id' element={<User />} />
+        <Route path='/blogs/:id' element={<Blog />} />
+      </Routes>
+    </>
   )
 }
 

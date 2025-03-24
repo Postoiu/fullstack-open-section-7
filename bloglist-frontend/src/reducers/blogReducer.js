@@ -126,4 +126,33 @@ export const remove = (blogToDelete) => {
   }
 }
 
+export const addComment = (blog, comment) => {
+  return async (dispatch) => {
+    try {
+      const updatedBlog = await blogService.postComments(blog.id, {
+        comments: blog.comments.concat(comment),
+      })
+      dispatch(updateBlog(updatedBlog))
+      dispatch(
+        setNotification(
+          {
+            message: 'Comment added',
+          },
+          5
+        )
+      )
+    } catch (exception) {
+      dispatch(
+        setNotification(
+          {
+            message: exception.response.data.error,
+            isError: true,
+          },
+          5
+        )
+      )
+    }
+  }
+}
+
 export default blogReducer.reducer

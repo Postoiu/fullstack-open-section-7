@@ -2,10 +2,9 @@ import { createSlice } from '@reduxjs/toolkit'
 import loginService from '../services/login'
 import blogService from '../services/blogs'
 import { setNotification } from './notificationReducer'
-import { initializeBlogs } from './blogReducer'
 
 const userReducer = createSlice({
-  name: 'user',
+  name: 'auth',
   initialState: null,
   reducers: {
     setUser: (state, action) => {
