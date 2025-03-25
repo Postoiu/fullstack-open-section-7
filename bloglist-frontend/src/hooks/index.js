@@ -17,3 +17,13 @@ export const useSetNotification = () => {
     }, timeout * 1000)
   }
 }
+
+export const useUser = () => {
+  const [user] = useContext(UserContext)
+  return user
+}
+
+export const useSetUser = () => {
+  const [, dispatch] = useContext(UserContext)
+  return dispatch
+}

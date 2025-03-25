@@ -2,6 +2,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import blogService from '../services/blogs'
 import { useSetNotification } from '../hooks'
+import {
+  Box,
+  Button,
+  FormGroup,
+  Input,
+  InputLabel,
+  Typography,
+} from '@mui/material'
 
 const BlogForm = ({ blogFormRef }) => {
   const [title, setTitle] = useState('')
@@ -24,10 +32,11 @@ const BlogForm = ({ blogFormRef }) => {
         },
         5
       )
-      const blogs = queryClient.getQueryData(['blogs'])
-      queryClient.setQueryData(['blogs'], blogs.concat(newBlog))
+      // const blogs = queryClient.getQueryData(['blogs'])
+      // queryClient.setQueryData(['blogs'], (blogs = []) => [...blogs, newBlog])
+      queryClient.invalidateQueries(['blogs'])
     },
-    onErorr: (error) => {
+    onError: (error) => {
       dispatchNotification(
         {
           type: 'SET',
@@ -60,50 +69,63 @@ const BlogForm = ({ blogFormRef }) => {
 
   return (
     <>
-      <h2>create new</h2>
-      <form onSubmit={addBlog}>
-        <div>
-          title:
-          <input
+      <Typography variant='h5' gutterBottom>
+        create new
+      </Typography>
+      <Box component='form' onSubmit={addBlog} sx={{ maxWidth: '50%' }}>
+        <FormGroup>
+          <InputLabel htmlFor='title'>title</InputLabel>
+          <Input
             data-testid='title'
             type='text'
             value={title}
             name='title'
+            id='title'
             onChange={({ target }) => setTitle(target.value)}
           />
-        </div>
-        <div>
-          author:
-          <input
+        </FormGroup>
+        <FormGroup>
+          <InputLabel htmlFor='author'>author</InputLabel>
+          <Input
             data-testid='author'
             type='text'
             value={author}
             name='author'
+            id='author'
             onChange={({ target }) => setAuthor(target.value)}
           />
-        </div>
-        <div>
-          url:
-          <input
+        </FormGroup>
+        <FormGroup>
+          <InputLabel htmlFor='url'>url</InputLabel>
+          <Input
             data-testid='url'
             type='text'
             value={url}
             name='url'
+            id='url'
             onChange={({ target }) => setUrl(target.value)}
           />
-        </div>
-        <div>
-          likes:
-          <input
+        </FormGroup>
+        <FormGroup>
+          <InputLabel htmlFor='likes'>likes</InputLabel>
+          <Input
             data-testid='likes'
             type='number'
             value={likes}
             name='likes'
+            id='likes'
             onChange={({ target }) => setLikes(parseInt(target.value))}
           />
-        </div>
-        <button type='submit'>create</button>
-      </form>
+        </FormGroup>
+        <Button
+          variant='contained'
+          size='small'
+          type='submit'
+          sx={{ margin: '10px 0' }}
+        >
+          create
+        </Button>
+      </Box>
     </>
   )
 }

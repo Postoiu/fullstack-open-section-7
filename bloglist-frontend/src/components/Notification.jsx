@@ -1,3 +1,4 @@
+import { Alert } from '@mui/material'
 import { useNotification } from '../hooks'
 
 const Notification = () => {
@@ -7,7 +8,11 @@ const Notification = () => {
     return null
   }
 
-  return <div className={`notification ${isError && 'error'}`}>{message}</div>
+  return (
+    <Alert severity={isError ? 'error' : 'success'} sx={{ marginBottom: 2 }}>
+      {message}
+    </Alert>
+  )
 }
 
 export default Notification
